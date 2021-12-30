@@ -1,12 +1,13 @@
 #include <gtkmm.h>
 #include <thread>  
 #include <atomic>
+#include <curl/curl.h>
 
 class MainWindow : public Gtk::Window
 {
 public:
   MainWindow();
-
+  ~MainWindow();
 protected:
   void startThread();
   void stopThread();
@@ -20,8 +21,12 @@ protected:
 
 private:
   void insertLoggingText(const std::string &text);
-  void process();
+  void request();
 
-  std::thread *thread;
-  std::atomic<bool> stopRunningThread;
+  std::thread *thread_;
+  std::atomic<bool> is_thread_done_;
+  std::atomic<bool> stop_running_thread_;
+  CURL *curl_;
+  CURLM *multi_handle_;
+  int still_running_;
 };
