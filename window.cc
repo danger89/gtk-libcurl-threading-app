@@ -106,6 +106,8 @@ void MainWindow::stopThread()
     else
     {
       this->insertLoggingText("Stop thread");
+      // Trigger the thread to stop now
+      // This is only possible with the cURL multi API
       stop_running_thread_ = true;
       thread_->join();
       stop_running_thread_ = false;
@@ -121,9 +123,9 @@ void MainWindow::stopThread()
  */
 void MainWindow::request()
 {
-  std::stringstream response;
+  std::stringstream response; // Needs to be stored outside the thread
 
-  // Add options
+  // Re-use the single handle, add options
   std::string url = "https://www.google.com/";
   curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
   curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, curl_cb_stream);
@@ -154,6 +156,7 @@ void MainWindow::request()
 
   curl_multi_remove_handle(multi_handle_, curl_);
 
+  // Just for info
   std::cout << "Body:" << response.str() << std::endl;
 
   is_thread_done_ = true;
