@@ -16,7 +16,7 @@ static size_t curl_cb_stream(
 
   const size_t n = size * nmemb;
 
-  // response->write(ptr, n);
+  response->write(ptr, n);
 
   return n;
 }
@@ -54,11 +54,8 @@ MainWindow::MainWindow() : m_vbox(Gtk::ORIENTATION_VERTICAL),
   // init a multi stack
   multi_handle_ = curl_multi_init();
 
-  std::stringstream response;
   // Create an easy handle
   curl_ = curl_easy_init();
-  //curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, curl_cb_stream);
-  //curl_easy_setopt(curl_, CURLOPT_WRITEDATA, &response);
 
   add(m_vbox);
   show_all_children();
@@ -71,7 +68,6 @@ MainWindow::~MainWindow()
 {
   curl_multi_remove_handle(multi_handle_, curl_);
   curl_easy_cleanup(curl_);
-
   curl_global_cleanup();
 }
 
@@ -125,9 +121,13 @@ void MainWindow::stopThread()
  */
 void MainWindow::request()
 {
+  std::stringstream response;
+
   // Add options
   std::string url = "https://www.google.com/";
   curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
+  curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, curl_cb_stream);
+  curl_easy_setopt(curl_, CURLOPT_WRITEDATA, &response);
   curl_easy_setopt(curl_, CURLOPT_NOSIGNAL, 1L);
 
   // easy handle
@@ -153,5 +153,8 @@ void MainWindow::request()
   } while (still_running_);
 
   curl_multi_remove_handle(multi_handle_, curl_);
+
+  std::cout << "Body:" << response.str() << std::endl;
+
   is_thread_done_ = true;
 }
