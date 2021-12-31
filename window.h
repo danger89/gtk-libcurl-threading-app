@@ -16,12 +16,13 @@ protected:
   Gtk::Box m_hbox;
   Gtk::Button m_button;
   Gtk::Button m_button1;
+  Gtk::Entry m_entry;
   Gtk::Label  m_label;
   Gtk::TextView m_textview;
 
 private:
   void insertLoggingText(const std::string &text);
-  void request();
+  void request(const std::string &url);
 
   std::thread *thread_;
   std::atomic<bool> is_thread_done_;
