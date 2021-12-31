@@ -39,7 +39,12 @@ MainWindow::MainWindow() : m_vbox(Gtk::ORIENTATION_VERTICAL),
   m_button.signal_clicked().connect(sigc::mem_fun(this, &MainWindow::startThread));
   m_button1.signal_clicked().connect(sigc::mem_fun(this, &MainWindow::stopThread));
 
-  m_entry.set_text("https://www.google.com"); // Initial url
+  // End marker of textview
+  m_endMark = m_textview.get_buffer()->create_mark(m_textview.get_buffer()->end(), false);
+
+  m_scrolledWindow.add(m_textview); // scrollable textview
+
+  m_entry.set_text("https://www.google.com"); // Initial URL
 
   // Add all elements to the horizontal box
   m_hbox.pack_start(m_button, false, false, 4);
@@ -49,7 +54,7 @@ MainWindow::MainWindow() : m_vbox(Gtk::ORIENTATION_VERTICAL),
   m_vbox.pack_start(m_entry, false, true, 4);
   m_vbox.pack_start(m_hbox, false, false, 4);
   m_vbox.pack_start(m_label, false, false, 4);
-  m_vbox.pack_end(m_textview, true, true, 4);
+  m_vbox.pack_end(m_scrolledWindow, true, true, 4);
 
   // Curl global init
   curl_global_init(CURL_GLOBAL_ALL);
@@ -81,7 +86,10 @@ void MainWindow::insertLoggingText(const std::string &text)
 {
   auto textViewBuffer = m_textview.get_buffer();
   auto endIter = textViewBuffer->end();
+  // Add text
   textViewBuffer->insert(endIter, text + "\n");
+  // Scroll to end marker
+  m_textview.scroll_to(m_endMark);
 }
 
 void MainWindow::startThread()
@@ -103,7 +111,7 @@ void MainWindow::stopThread()
   {
     if (is_thread_done_)
     {
-      this->insertLoggingText("Reset thread");
+      this->insertLoggingText("Only reset thread");
       thread_->join();
     }
     else
@@ -128,13 +136,12 @@ void MainWindow::request(const std::string &url)
 {
   std::stringstream response;
 
-  // We need to be able to pass 'stop_running_thread_' variable through the IPFS C++ client interface.
+  // We need to be able to pass 'stop_running_thread_' boolean through the IPFS C++ client interface.
   // Which can then be used internally, inside the C++ IPFS client, in the while loop as shown below.
   /* IPFS C++ curl lib interface can start here */
 
   // Re-use the single handle, add options
   curl_easy_setopt(curl_, CURLOPT_URL, url.c_str());
-  // TODO: How to stop the writefunction asap, when stop_running_thread_ = true!?
   curl_easy_setopt(curl_, CURLOPT_WRITEFUNCTION, curl_cb_stream);
   curl_easy_setopt(curl_, CURLOPT_WRITEDATA, &response);
   curl_easy_setopt(curl_, CURLOPT_NOSIGNAL, 1L);
@@ -152,7 +159,7 @@ void MainWindow::request(const std::string &url)
 
     if (!mc && still_running_)
       /* wait for activity, timeout or "nothing" */
-      mc = curl_multi_poll(multi_handle_, NULL, 0, 100, NULL);
+      mc = curl_multi_poll(multi_handle_, NULL, 0, 40, NULL);
 
     if (mc)
     {
@@ -166,8 +173,13 @@ void MainWindow::request(const std::string &url)
 
   /* IPFS C++ curl lib interface stops here */
 
-  // Output response just for info
-  std::cout << "Body:" << response.str() << std::endl;
+  // Only process response when we did not stop,
+  // otherwise the main thread will be blocked on str()
+  if (!stop_running_thread_)
+  {
+    // Output response just for info
+    std::cout << "Body:" << response.str() << std::endl;
+  }
 
   is_thread_done_ = true;
 }

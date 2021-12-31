@@ -19,6 +19,8 @@ protected:
   Gtk::Entry m_entry;
   Gtk::Label  m_label;
   Gtk::TextView m_textview;
+  Gtk::ScrolledWindow m_scrolledWindow;
+  Glib::RefPtr<Gtk::TextBuffer::Mark> m_endMark;
 
 private:
   void insertLoggingText(const std::string &text);
