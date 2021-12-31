@@ -1,5 +1,5 @@
 #include <gtkmm.h>
-#include <thread>  
+#include <thread>
 #include <atomic>
 #include <curl/curl.h>
 
@@ -8,6 +8,7 @@ class MainWindow : public Gtk::Window
 public:
   MainWindow();
   ~MainWindow();
+
 protected:
   void startThread();
   void stopThread();
@@ -17,7 +18,7 @@ protected:
   Gtk::Button m_button;
   Gtk::Button m_button1;
   Gtk::Entry m_entry;
-  Gtk::Label  m_label;
+  Gtk::Label m_label;
   Gtk::TextView m_textview;
   Gtk::ScrolledWindow m_scrolledWindow;
   Glib::RefPtr<Gtk::TextBuffer::Mark> m_endMark;
