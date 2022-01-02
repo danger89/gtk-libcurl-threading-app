@@ -4,15 +4,15 @@
 /** CURL callback for writing the result to a stream. */
 static size_t curl_cb_stream(
     /** [in] Pointer to the result. */
-    char *ptr,
+    char* ptr,
     /** [in] Size each chunk of the result. */
     size_t size,
     /** [in] Number of chunks in the result. */
     size_t nmemb,
     /** [out] Response (a pointer to `std::iostream`). */
-    void *response_void)
+    void* response_void)
 {
-  std::iostream *response = static_cast<std::iostream *>(response_void);
+  std::iostream* response = static_cast<std::iostream*>(response_void);
 
   const size_t n = size * nmemb;
 
@@ -21,14 +21,15 @@ static size_t curl_cb_stream(
   return n;
 }
 
-MainWindow::MainWindow() : m_vbox(Gtk::ORIENTATION_VERTICAL),
-                           m_button("Start thread"),
-                           m_button1("Stop thread"),
-                           m_label("Output logging:"),
-                           thread_(nullptr),
-                           is_thread_done_(false),
-                           stop_running_thread_(false),
-                           still_running_(0)
+MainWindow::MainWindow()
+    : m_vbox(Gtk::ORIENTATION_VERTICAL),
+      m_button("Start thread"),
+      m_button1("Stop thread"),
+      m_label("Output logging:"),
+      thread_(nullptr),
+      is_thread_done_(false),
+      stop_running_thread_(false),
+      still_running_(0)
 {
   set_title("C++ Threading with cURL Example App");
   set_default_size(1000, 680);
@@ -82,7 +83,7 @@ MainWindow::~MainWindow()
 /**
  * Insert text to the end of the textview
  */
-void MainWindow::insertLoggingText(const std::string &text)
+void MainWindow::insertLoggingText(const std::string& text)
 {
   auto textViewBuffer = m_textview.get_buffer();
   auto endIter = textViewBuffer->end();
@@ -132,7 +133,7 @@ void MainWindow::stopThread()
 /**
  * Running the request inside a thread
  */
-void MainWindow::request(const std::string &url)
+void MainWindow::request(const std::string& url)
 {
   std::stringstream response;
 

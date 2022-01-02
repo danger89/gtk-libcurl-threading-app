@@ -1,7 +1,7 @@
-#include <gtkmm.h>
-#include <thread>
 #include <atomic>
 #include <curl/curl.h>
+#include <gtkmm.h>
+#include <thread>
 
 class MainWindow : public Gtk::Window
 {
@@ -24,13 +24,13 @@ protected:
   Glib::RefPtr<Gtk::TextBuffer::Mark> m_endMark;
 
 private:
-  void insertLoggingText(const std::string &text);
-  void request(const std::string &url);
+  void insertLoggingText(const std::string& text);
+  void request(const std::string& url);
 
-  std::thread *thread_;
+  std::thread* thread_;
   std::atomic<bool> is_thread_done_;
   std::atomic<bool> stop_running_thread_;
-  CURL *curl_;
-  CURLM *multi_handle_;
+  CURL* curl_;
+  CURLM* multi_handle_;
   int still_running_;
 };
