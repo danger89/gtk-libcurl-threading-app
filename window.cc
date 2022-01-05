@@ -75,6 +75,8 @@ MainWindow::MainWindow()
  */
 MainWindow::~MainWindow()
 {
+  this->stopThread();
+
   curl_multi_remove_handle(multi_handle_, curl_);
   curl_easy_cleanup(curl_);
   curl_global_cleanup();
