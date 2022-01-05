@@ -28,8 +28,7 @@ MainWindow::MainWindow()
       m_label("Output logging:"),
       thread_(nullptr),
       is_thread_done_(false),
-      keep_thread_running_(true),
-      still_running_(0)
+      keep_thread_running_(true)
 {
   set_title("C++ Threading with cURL Example App");
   set_default_size(1000, 680);
@@ -137,6 +136,7 @@ void MainWindow::stopThread()
  */
 void MainWindow::request(const std::string& url)
 {
+  int still_running = 0;
   std::stringstream response;
 
   // We need to be able to pass 'keep_thread_running_' boolean through the IPFS C++ client interface.
@@ -154,13 +154,13 @@ void MainWindow::request(const std::string& url)
 
   do
   {
-    CURLMcode mc = curl_multi_perform(multi_handle_, &still_running_);
+    CURLMcode mc = curl_multi_perform(multi_handle_, &still_running);
 
     // Allow to break/stop the thread at any given moment
     if (!keep_thread_running_)
       break;
 
-    if (!mc && still_running_)
+    if (!mc && still_running)
       /* wait for activity, timeout or "nothing" */
       mc = curl_multi_poll(multi_handle_, NULL, 0, 40, NULL);
 
@@ -170,7 +170,7 @@ void MainWindow::request(const std::string& url)
       break;
     }
 
-  } while (still_running_);
+  } while (still_running);
 
   curl_multi_remove_handle(multi_handle_, curl_);
 

@@ -32,5 +32,4 @@ private:
   std::atomic<bool> keep_thread_running_;
   CURL* curl_;
   CURLM* multi_handle_;
-  int still_running_;
 };
