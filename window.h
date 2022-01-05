@@ -29,7 +29,7 @@ private:
 
   std::thread* thread_;
   std::atomic<bool> is_thread_done_;
-  std::atomic<bool> stop_running_thread_;
+  std::atomic<bool> keep_thread_running_;
   CURL* curl_;
   CURLM* multi_handle_;
   int still_running_;
